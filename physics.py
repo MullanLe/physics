@@ -12,7 +12,11 @@ class IdealGas:
 
     @property
     def moles(self):
-        return self._moles
+        if self._moles == None:
+            moles = (self.pres*self.vol)/(self.R*self.temp)
+            return moles
+        else: 
+            return self._moles
 
     @moles.setter
     def moles(self, new_moles):
@@ -20,15 +24,23 @@ class IdealGas:
 
     @property
     def pres(self):
-        return self._pres
+        if self._pres == None:
+            pres = (self.R*self.moles*self.temp) / self.vol
+            return pres
+        else:
+            return self._pres
 
     @pres.setter
-    def pres(self, new_pres):
+    def pres(self, new_pres):            
         self._pres = new_pres
 
     @property
     def temp(self):
-        return self._temp
+        if self._temp == None:
+            temp = (self.R*self.moles*self.pres) / self.vol
+            return temp
+        else:
+            return self._temp
 
     @temp.setter
     def temp(self, new_temp):
@@ -41,11 +53,10 @@ class IdealGas:
     @property
     def vol(self):
         if self._vol == None:
-            _moles = self.moles
-            _pres = self.pres
-            _temp = self.temp.magnitude
-            _R = self.R
-            volume = (_R*_moles*_pres) / _temp
+            _R = self.R if not self.R == type(un.Unit) else self.R.magnitude
+            _pres = self.pres if not isinstance(self.pres, un.Pres) else self.pres.magnitude
+            _temp =  self.temp if not self.temp == type(un.Unit) else self.temp.magnitude
+            volume = (_R*self.moles*_pres) / _temp
             return volume
         else:
             return self._vol
@@ -55,10 +66,8 @@ class IdealGas:
         self._vol = new_vol
         
 
-inlettemp = un.Temp(50, 'C')
-
-inlet = IdealGas(moles=1, pres=10, temp=inlettemp)
-print(inlet.vol)
-
-inlettemp = 40
-print(inlet.vol)
+inletpres = un.Pres(10, 'psi')
+inlet = IdealGas(pres=inletpres, temp=50, moles=1)
+print(inlet.moles, inlet.R, inlet.vol, inlet.temp, inlet.pres)
+inlet.pres = 20
+print(inlet.moles, inlet.R, inlet.vol, inlet.temp, inlet.pres)
